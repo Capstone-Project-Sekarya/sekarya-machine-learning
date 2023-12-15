@@ -12,7 +12,7 @@ model = tf.keras.models.load_model('./model.h5')
 # Image labels
 labels = {0: 'AI_GENERATED',
           1: "NON_AI_GENERATED"}
-
+#test
 # Used to preprocess images into array before predicting them
 def preprocess_image(image_path):
     image = load_img(image_path, target_size=(224, 224))
