@@ -6,13 +6,16 @@ import tensorflow as tf
 from keras.utils import load_img, img_to_array
 import json
 
+# Threshold (level of tolerance for the classification) 
+THRESHOLD = 0.5
+
 # Load the ML model
 model = tf.keras.models.load_model('./model.h5')
 
 # Image labels
 labels = {0: 'AI_GENERATED',
           1: "NON_AI_GENERATED"}
-#test
+
 # Used to preprocess images into array before predicting them
 def preprocess_image(image_path):
     image = load_img(image_path, target_size=(224, 224))
@@ -23,6 +26,7 @@ def preprocess_image(image_path):
 # Used to predict the images' class
 def predict_image(image):
     prediction = model.predict(image, verbose=0)
+    prediction = (prediction > THRESHOLD).astype(int)
     return labels.get(prediction[0, 0])
 
 app = Flask(__name__)
