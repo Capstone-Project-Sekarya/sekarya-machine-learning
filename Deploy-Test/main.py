@@ -47,15 +47,17 @@ def index():
                 image = preprocess_image('uploaded_image.jpg')
                 prediksi_label = predict_image(image)
 
+                if prediksi_label == 'AI_GENERATED':
+                    return jsonify({"status": "bad request"}), 400
+
                 result = {'predicted_class': prediksi_label}
                 return jsonify(result)
             # catch (jika request tidak valid)
             except:
-                return jsonify({"status": "bad request"})
+                return jsonify({"status": "bad request"}), 400
         # Jika Kunci API Salah
         else:
             return jsonify({"status": "unauthorized"})
-
 
 # Memulai Server
 if __name__ == "__main__":
