@@ -6,13 +6,16 @@ import tensorflow as tf
 from keras.utils import load_img, img_to_array
 import json
 
+# Threshold (level of tolerance for the classification) 
+THRESHOLD = 0.5
+
 # Load the ML model
 model = tf.keras.models.load_model('./model.h5')
 
 # Image labels
 labels = {0: 'AI_GENERATED',
           1: "NON_AI_GENERATED"}
-#test
+
 # Used to preprocess images into array before predicting them
 def preprocess_image(image_path):
     image = load_img(image_path, target_size=(224, 224))
@@ -23,6 +26,7 @@ def preprocess_image(image_path):
 # Used to predict the images' class
 def predict_image(image):
     prediction = model.predict(image, verbose=0)
+    prediction = (prediction > THRESHOLD).astype(int)
     return labels.get(prediction[0, 0])
 
 app = Flask(__name__)
@@ -43,15 +47,17 @@ def index():
                 image = preprocess_image('uploaded_image.jpg')
                 prediksi_label = predict_image(image)
 
+                if prediksi_label == 'AI_GENERATED':
+                    return jsonify({"status": "bad request"}), 400
+
                 result = {'predicted_class': prediksi_label}
                 return jsonify(result)
             # catch (jika request tidak valid)
             except:
-                return jsonify({"status": "bad request"})
+                return jsonify({"status": "bad request"}), 400
         # Jika Kunci API Salah
         else:
             return jsonify({"status": "unauthorized"})
-
 
 # Memulai Server
 if __name__ == "__main__":
